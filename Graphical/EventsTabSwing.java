@@ -1,47 +1,98 @@
 package Graphical;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EventsTabSwing extends JPanel {
-
-    private final List<String> upcomingEvents = new ArrayList<>();
+    private final Map<String, List<String>> eventCategories = new HashMap<>();
+    private JTextArea eventTextArea;
+    private JButton submitButton;
+    private JPanel eventPanel;
 
     public EventsTabSwing() {
-        JLabel eventsLabel = new JLabel("Upcoming Events");
-        add(eventsLabel);
+        setLayout(new BorderLayout());
 
-        JTextArea eventTextArea = new JTextArea(5, 30);
+        // Create a panel for the buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        // Create buttons for event categories
+        JButton weddingsButton = new JButton("Weddings");
+        JButton burialsButton = new JButton("Burials");
+        JButton sportsButton = new JButton("Sports Activities");
+        JButton voluntaryButton = new JButton("Voluntary Activities");
+
+        // Initialize event lists for each category
+        eventCategories.put("Weddings", new ArrayList<>());
+        eventCategories.put("Burials", new ArrayList<>());
+        eventCategories.put("Sports Activities", new ArrayList<>());
+        eventCategories.put("Voluntary Activities", new ArrayList<>());
+
+        // Add action listeners to buttons
+        weddingsButton.addActionListener(e -> showEventUI("Weddings"));
+        burialsButton.addActionListener(e -> showEventUI("Burials"));
+        sportsButton.addActionListener(e -> showEventUI("Sports Activities"));
+        voluntaryButton.addActionListener(e -> showEventUI("Voluntary Activities"));
+
+        // Add buttons to the button panel
+        buttonPanel.add(weddingsButton);
+        buttonPanel.add(burialsButton);
+        buttonPanel.add(sportsButton);
+        buttonPanel.add(voluntaryButton);
+
+        // Add the button panel to the main panel
+        add(buttonPanel, BorderLayout.NORTH);
+
+        // Initialize the event panel with the "Weddings" category
+        showEventUI("Weddings");
+    }
+
+    private void showEventUI(String category) {
+        if (eventPanel != null) {
+            remove(eventPanel);
+        }
+
+        eventPanel = new JPanel(new BorderLayout());
+
+        eventTextArea = new JTextArea(5, 30);
         eventTextArea.setLineWrap(true);
-        add(eventTextArea);
+        eventPanel.add(new JScrollPane(eventTextArea), BorderLayout.CENTER);
 
-        JButton submitButton = new JButton("Submit Event");
+        submitButton = new JButton("Submit Event");
         submitButton.addActionListener(e -> {
             String eventText = eventTextArea.getText();
             if (!eventText.isEmpty()) {
-                upcomingEvents.add(eventText);
+                eventCategories.get(category).add(eventText);
                 eventTextArea.setText(""); // Clear the input field
-                // Update the UI to display the new event (e.g., add to a list)
-                // You can customize this part based on your UI design.
+                displayEvents(category);
             }
         });
-        add(submitButton);
+        eventPanel.add(submitButton, BorderLayout.SOUTH);
 
-        // Display the list of upcoming events (customize as needed)
-        // For simplicity, we'll just print them to the console here.
-        upcomingEvents.forEach(System.out::println);
+        add(eventPanel, BorderLayout.CENTER);
+        displayEvents(category);
+        revalidate(); // Update the panel's layout
+        repaint(); // Redraw the panel
     }
 
-    // Other methods for handling events (e.g., editing, deleting) can be added here
-    // ...
+    private void displayEvents(String category) {
+        JTextArea eventsDisplay = new JTextArea(10, 30);
+        eventsDisplay.setEditable(false);
+        for (String event : eventCategories.get(category)) {
+            eventsDisplay.append(event + "\n");
+        }
+        eventPanel.add(new JScrollPane(eventsDisplay), BorderLayout.NORTH);
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Upcoming Events Tab (Swing)");
             frame.add(new EventsTabSwing());
 
-            frame.setSize(400, 300);
+            frame.setSize(600, 400);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setVisible(true);
         });

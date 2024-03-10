@@ -29,7 +29,6 @@ public class HomeTabSwing extends JPanel {
 
         // Display all initial activities
         updateActivitiesTextArea();
-        
 
         // Create the "About" panel
         JPanel aboutPanel = new JPanel(new BorderLayout());
@@ -149,7 +148,7 @@ public class HomeTabSwing extends JPanel {
                 if (validateUserData(name, password)) {
                     logInFrame.dispose();
                     JOptionPane.showMessageDialog(HomeTabSwing.this, "Log-in successful.");
-                    // Proceed to the main application or the next step
+                    showEventsTab(); // Show the events tab after successful login
                 } else {
                     JOptionPane.showMessageDialog(HomeTabSwing.this, "Incorrect information.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -161,6 +160,18 @@ public class HomeTabSwing extends JPanel {
         // Example: Checking against the stored HashMap
         String storedPassword = userDataMap.get(name);
         return storedPassword != null && storedPassword.equals(password);
+    }
+
+    private void showEventsTab() {
+        // Create an instance of the EventsTabSwing class
+        EventsTabSwing eventsTab = new EventsTabSwing();
+
+        // Create a new JFrame to display the EventsTabSwing
+        JFrame eventsFrame = new JFrame("Events Tab");
+        eventsFrame.add(eventsTab);
+        eventsFrame.setSize(600, 400);
+        eventsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        eventsFrame.setVisible(true);
     }
 
     public static void main(String[] args) {
